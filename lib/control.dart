@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'dart:async';
 
 void main() {
   runApp(RobotControlApp());
@@ -15,7 +16,34 @@ class RobotControlApp extends StatelessWidget {
   }
 }
 
-class RobotDashboard extends StatelessWidget {
+class RobotDashboard extends StatefulWidget {
+  @override
+  _RobotDashboardState createState() => _RobotDashboardState();
+}
+
+class _RobotDashboardState extends State<RobotDashboard> {
+  late Timer _timer;
+  double _gasLevel = 0.0;
+  String _lidarStatus = "Tarama Yapılıyor...";
+
+  @override
+  void initState() {
+    super.initState();
+    // Simulate data updates
+    _timer = Timer.periodic(Duration(seconds: 1), (timer) {
+      setState(() {
+        _gasLevel = (20 + (10 * (timer.tick % 10))).toDouble(); // Simulated gas value
+        _lidarStatus = timer.tick % 2 == 0 ? "Haritalama Başarılı" : "Tarama Yapılıyor...";
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer.cancel();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -45,7 +73,7 @@ class RobotDashboard extends StatelessWidget {
                       color: Colors.grey[850],
                       child: Center(
                         child: Text(
-                          'LIDAR Verisi',
+                          'LIDAR Verisi: $_lidarStatus',
                           style: TextStyle(fontSize: 16, color: Colors.white),
                         ),
                       ),
@@ -70,7 +98,7 @@ class RobotDashboard extends StatelessWidget {
                                   Text('GPS Bağlantısı: Bağlı'),
                                   Text('Ağ Bağlantısı: Bağlı'),
                                   Text('Kamera Veri Akışı: Aktif'),
-                                  Text('Gaz Sensörü Verisi: Stabil'),
+                                  Text('Gaz Sensörü Verisi: $_gasLevel ppm'),
                                 ],
                               ),
                             ),
@@ -100,10 +128,10 @@ class RobotDashboard extends StatelessWidget {
                                     fontSize: 16, fontWeight: FontWeight.bold)),
                             Divider(color: Colors.white),
                             Text('Konum: Tanımlanıyor...'),
-                            Text('Haritalama: Aktif'),
+                            Text('Haritalama: $_lidarStatus'),
                             Text('Hareket: Beklemede'),
                             Text('Hedef Takibi: Pasif'),
-                            Text('Gaz Tespiti: Güvenli'),
+                            Text('Gaz Tespiti: Güvenli ($_gasLevel ppm)'),
                           ],
                         ),
                       ),
